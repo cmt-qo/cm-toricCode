@@ -1,0 +1,88 @@
+This folder contains all necessary codes to run a simulation of the correction process for the general 
+non-solvable case. The lattice length is set to L=3. The user can choose between simulation faulty
+and non-faulty measurements. Default is set to non-faulty measurements.
+
+####################### COMPILING THE CODE ###########################################################
+
+The provided codes ending with ".cc" use the standard c++ library and no additional packages. They can
+be compiled using the command "make" in the root directory of this package.
+The executable "run_quantumsim" is produced.
+
+A c++11 compliant compiler is assumed. Parallel programming using OpenMP is used.
+These codes are used to calculate expectation values via full quantum simulation.
+
+
+The provided codes ending with ".py" use Python 2.7 and the TensorFlow library.
+These codes are used to evaluate a pre-trained neural network.
+
+######################################################################################################
+
+
+########################## RUNNING A SIMULATION ######################################################
+
+Minimal usage:
+Once compiled, the necessary steps to run a simulation with 4 correction iterations are contained in 
+the script "run.sh". 
+To run, the user may give permission with "chmod +x run.sh" and execute the script with the command 
+"./run.sh".
+Alternatively, the user might run the steps detailed in the section 'Additional description of the 
+simulation' by hand.
+
+IMPORTANT:
+The simulation is parallelized and takes about 1.5 hours on a computation node with 72 threads and is 
+not to be run on a laptop.
+
+Outcome of the simulation are the following files:
+'rbl_x0.txt', 'rbl_z0.txt': these are the initial field configurations
+'rbl_x.txt', 'rbl_z.txt': these are the final field configurations after 4 iterations
+The field configurations can be compared.
+In addition, in every iteration step the probability of a single qubit error and the Hamiltonian error
+are calculated and printed.
+
+######################################################################################################
+
+
+######################### ADDITIONAL DESCRIPTION OF THE SIMULATION ###################################
+
+A detailed description of the steps executed by the script 'run.sh' is given in the following, but
+is only given for completeness and NOT NECESSARY to read for usage.
+
+The script executes the given codes in the following order:
+
+1) "make_rbl.py": creates random initial field configurations stored in the files "rbl_x.txt" 
+(fields in z-direction) and "rbl_z.txt" (fields in x-direction) together with copies "rbl_x0.txt" and 
+"rbl_z0.txt". To test for field configurations of a different type, the file "make_rbl.py" can be 
+changed accordingly.
+
+
+3) "run_quantumsim": takes field configurations "rbl_x.txt" and "rbl_z.txt" and outputs expectation 
+values "expv_x.txt" and "expv_z.txt" calculated via Monte Carlo sampling in the structure [nspins,3]. 
+Each row corresponds to one spin and contains all stabilizer expectation values of X-loops 
+("expv_x.txt") and Z-loops ("expv_z.txt")
+In addition, the expectation values "sign_x.txt" and "sign_z.txt" calculated via Monte Carlo sampling 
+are outputted in the structure [nspins,1]. Each row corresponds to one spin and contains the 
+expectation value of sigma_z (sigma_x) measured on that spin
+
+4) "eval_network.py": takes expectation values "expv_x.txt" and "expv_z.txt" as input and estimates 
+absolute values of field configurations. With the additional input of "sign_x.txt" and "sign_z.txt", 
+the signs of the field configurations are estimated and the field configurations "rbl_x.txt" and 
+"rbl_z.txt" corrected using the estimated values.
+The corrected "rbl_x.txt" and "rbl_z.txt" can be compared with the initial configurations "rbl_x0.txt" 
+and "rbl_z0.txt"
+
+5) The steps 3)-4) correspond to one iteration. They are repeated 4 times and in every step the 
+probability of a single qubit error as well as the Hamiltonian error are calculated and printed. The 
+field configurations obtained after 4 iterations "rbl_x.txt" and "rbl_z.txt" can be compared with 
+initial field configurations "rbl_x0.txt" and "rbl_z0.txt" with respect to the magnitude of the 
+remaining fields.
+
+######################################################################################################
+
+
+##################### SIMULATION OF FAULTY MEASUREMENTS ##############################################
+
+Noisy measurement outcomes are simulated by opening the file 'eval_network.py' and setting the
+parameter 'faulty=True'. Gaussian noise is then added to the expectation value outcomes. The standard 
+deviation of the noise can be varied by changing the parameter 'coeff'. By default, it is set to 0.05.
+
+######################################################################################################
