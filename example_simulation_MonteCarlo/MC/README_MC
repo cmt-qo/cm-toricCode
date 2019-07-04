@@ -1,0 +1,2 @@
+This folder contains functions and classes used to calculate expectation values via Monte Carlo sampling. 
+The functions and classes are called by "main.cc" in the root folder.
