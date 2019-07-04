@@ -1,0 +1,1 @@
+This folder contains the trained neural network with checkpoints in the folder "slstates_dense_k*" for different lattice sizes.
